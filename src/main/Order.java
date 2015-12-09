@@ -12,6 +12,8 @@ public class Order {
 	
 	private String content;
 	
+	private String address;
+	
 	public Order() {
 		status = OrderStatus.INIT;
 		dateOfOrder = new Date();
@@ -51,7 +53,15 @@ public class Order {
 	
 	@Override
 	public String toString() {
-		return "(" + clientNumber + ")" +content;
+		return "(" + clientNumber + ") " +content + " " + status.getLabel();
+	}
+
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
 	}
 
 }

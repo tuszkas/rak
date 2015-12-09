@@ -15,16 +15,16 @@ import com.ericsson.hosasdk.api.hui.IpHosaUIManager;
 import com.ericsson.hosasdk.api.mm.ul.IpUserLocation;
 import com.ericsson.hosasdk.utility.framework.FWproxy;
 
-public class Sample {
+public class ConfigurationLoader {
 	private FWproxy itsFramework;
 	private IpHosaUIManager itsHosaUIManager;
 	private IpUserLocation itsOsaULManager;
 	public SMSProcessor smsProcessor;
 	public GUI theGUI;
 
-	public Sample(GUI aGUI) {
+	public ConfigurationLoader(GUI aGUI) {
 		theGUI = aGUI;
-		aGUI.setTitle("Mobilny informator");
+		aGUI.setTitle("Pizza GSM");
 	}
 
 	protected void start() {

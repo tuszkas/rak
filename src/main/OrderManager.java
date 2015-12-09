@@ -21,4 +21,16 @@ public class OrderManager {
 		order.setContent(message.substring(6));
 		orders.add(order);
 	}
+	
+	public void updateOrderStatus(OrderStatus newStatus, int orderIndex) {
+		orders.get(orderIndex).setStatus(newStatus);
+	}
+	
+	public Order getOrder(int index) {
+		return orders.get(index);
+	}
+	
+	public void deleteOrder(int index) {
+		orders.remove(index);
+	}
 }

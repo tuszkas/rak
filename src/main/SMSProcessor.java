@@ -41,7 +41,7 @@ public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
 		IpAppHosaUIManager {
 	private static final String WORKER_NUMBER = "11111";
 	private IpHosaUIManager itsHosaUIManager;
-	private Sample parent;
+	private ConfigurationLoader parent;
 	private OrderManager orderManager = new OrderManager();
 
 	/**
@@ -53,7 +53,7 @@ public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
 	 *            SMSProcessor wiadomości do wysłania i przetwarza odbierane
 	 *            wiadomości
 	 */
-	public SMSProcessor(IpHosaUIManager aHosaUIManager, Sample aParent) {
+	public SMSProcessor(IpHosaUIManager aHosaUIManager, ConfigurationLoader aParent) {
 		itsHosaUIManager = aHosaUIManager;
 		this.parent = parent;
 	}

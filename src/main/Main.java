@@ -8,7 +8,7 @@ import java.io.IOException;
 import javax.swing.AbstractAction;
 
 public class Main {
-	private Sample sample;
+	private ConfigurationLoader sample;
 
 	public static void main(String[] args) throws Exception {
 		new Main();
@@ -21,7 +21,7 @@ public class Main {
 				start();
 			}
 		});
-		sample = new Sample(gui);
+		sample = new ConfigurationLoader(gui);
 		gui.addButton(new AbstractAction("Stop") {
 			public void actionPerformed(ActionEvent e) {
 				stop();

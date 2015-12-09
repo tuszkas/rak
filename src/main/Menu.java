@@ -13,7 +13,6 @@ import java.io.UnsupportedEncodingException;
 public class Menu {
 
 	private Menu() {
-		
 	}
 	
 	public static String getMenu() {
@@ -21,9 +20,9 @@ public class Menu {
 		String menu = "";
 		try {
 			br = new BufferedReader(new InputStreamReader(new FileInputStream(
-					"C:/Users/Marcin/kti/rak/resources/menu.txt"), "UTF8"));
+					"C:/Users/Marcin/kti/rak/src/resources/menu.txt"), "UTF8"));
 			String line = br.readLine();
-			while (!line.equals("")){
+			while (line != null && !line.equals("")){
 				menu = menu + line;
 			    line = br.readLine();
 			}
@@ -41,11 +40,10 @@ public class Menu {
 		return menu;
 	}
 	
-	public static String addItem(String itemText) {
+	public static void addItem(String itemText) {
 		BufferedWriter br;
-		String menu = "Error";
 		try {
-			br = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:/Users/Marcin/kti/rak/resources/menu.txt", true),  "UTF8"));
+			br = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:/Users/Marcin/kti/rak/src/resources/menu.txt", true),  "UTF8"));
 			br.write(" \n" + itemText.substring(6));
 			br.close();
 		} catch (UnsupportedEncodingException e) {
@@ -55,6 +53,18 @@ public class Menu {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		return menu;
+	}
+	
+	public static String getMenuItem(int index) {
+		//TODO: unimplemented method
+		return null;
+	}
+	
+	public static void deleteMenuItem(int index) {
+		//TODO: unimplemented method
+	}
+	
+	public static void editMenuItem(int index, String newItemText) {
+		//TODO: unimplemented method
 	}
 }

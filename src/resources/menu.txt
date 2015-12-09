@@ -1,3 +1,4 @@
 1 Margherita 12,40zl
 2 Capriciosa 13,00 zl
-3 Diabolo 20,00 zl
+3 Diabolo 20,00 zl 
+4 Fungi 13,00 zl

@@ -12,9 +12,6 @@ import java.io.UnsupportedEncodingException;
 
 public class Menu {
 
-	private Menu() {
-	}
-	
 	public static String getMenu() {
 		BufferedReader br;
 		String menu = "";
@@ -43,13 +40,11 @@ public class Menu {
 	public static void addItem(String itemText) {
 		BufferedWriter br;
 		try {
-			br = new BufferedWriter(new OutputStreamWriter(new FileOutputStream("C:/Users/Marcin/kti/rak/src/resources/menu.txt", true),  "UTF8"));
+			br = new BufferedWriter(
+					new OutputStreamWriter(new FileOutputStream("C:/Users/Marcin/kti/rak/src/resources/menu.txt", true),
+							"UTF8"));
 			br.write(" \n" + itemText.substring(6));
 			br.close();
-		} catch (UnsupportedEncodingException e) {
-			e.printStackTrace();
-		} catch (FileNotFoundException e) {
-			e.printStackTrace();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

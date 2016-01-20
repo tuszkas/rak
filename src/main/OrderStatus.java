@@ -2,7 +2,7 @@ package main;
 
 public enum OrderStatus {
 	
-	INIT("Otrzymano"), ACCEPTED("Potwierdzono"), SENT("Wys³ano"), REJECTED("Odrzucono");
+	INIT("Otrzymano"), ACCEPTED("Potwierdzono"), SENT("Wyslano"), REJECTED("Odrzucono");
 	
 
 	private final String label;

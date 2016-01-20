@@ -53,7 +53,7 @@ public class Order {
 	
 	@Override
 	public String toString() {
-		return "(" + clientNumber + ") " +content + " " + status.getLabel();
+		return "(" + clientNumber + ") " + content + " " + status.getLabel();
 	}
 
 	public String getAddress() {

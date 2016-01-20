@@ -1,18 +1,12 @@
 //SMSProcessor.java
 package main;
 
-import java.io.BufferedReader;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 import com.ericsson.hosasdk.api.TpAddress;
 import com.ericsson.hosasdk.api.TpAddressPlan;
-import com.ericsson.hosasdk.api.TpAddressRange;
 import com.ericsson.hosasdk.api.TpAddressPresentation;
+import com.ericsson.hosasdk.api.TpAddressRange;
 import com.ericsson.hosasdk.api.TpAddressScreening;
 import com.ericsson.hosasdk.api.TpHosaDeliveryTime;
 import com.ericsson.hosasdk.api.TpHosaMessage;
@@ -31,40 +25,34 @@ import com.ericsson.hosasdk.api.ui.TpUIEventNotificationInfo;
 import com.ericsson.hosasdk.api.ui.TpUIIdentifier;
 
 /**
- * Klasa odpowiedzialna za
- * <ul>
- * <li>Wysyłanie SMSów.</li>
- * <li>Obsługę przekazanie przychodzących SMSów do klasy Informer</li>
- * </ul>
+ * Klasa odpowiedzialna za <ul> <li>Wysyłanie SMSów.</li> <li>Obsługę przekazanie przychodzących SMSów do klasy
+ * Informer</li> </ul>
  */
-public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
-		IpAppHosaUIManager {
+public class SMSProcessor extends IpAppHosaUIManagerAdapter implements IpAppHosaUIManager {
 	private static final String WORKER_NUMBER = "11111";
 	private IpHosaUIManager itsHosaUIManager;
 	private ConfigurationLoader parent;
 	private OrderManager orderManager = new OrderManager();
+	private Menu menu = new Menu();
 
 	/**
 	 * @param aHosaUIManager
-	 *            menadŜer słuŜacy do komunikacji z Ericsson Network Resource
-	 *            Gateway
+	 * 		menadŜer słuŜacy do komunikacji z Ericsson Network Resource Gateway
 	 * @param aParent
-	 *            Referencja do klasy-rodzica Informer, która przekazuje klasie
-	 *            SMSProcessor wiadomości do wysłania i przetwarza odbierane
-	 *            wiadomości
+	 * 		Referencja do klasy-rodzica Informer, która przekazuje klasie SMSProcessor wiadomości do wysłania i przetwarza
+	 * 		odbierane wiadomości
 	 */
 	public SMSProcessor(IpHosaUIManager aHosaUIManager, ConfigurationLoader aParent) {
 		itsHosaUIManager = aHosaUIManager;
-		this.parent = parent;
+		this.parent = aParent;
 	}
 
 	/**
-	 * Funkcja dodaje nasłuch przychodzacych wiadomości dla podanego numeru
-	 * (uŜytkownik o tym numerze nie musi istnieć, moŜe to być numer usługi)
-	 * 
+	 * Funkcja dodaje nasłuch przychodzacych wiadomości dla podanego numeru (uŜytkownik o tym numerze nie musi istnieć,
+	 * moŜe to być numer usługi)
+	 *
 	 * @param sDest
-	 *            Adres (numer) uŜytkownika, dla którego utworzona jest
-	 *            notyfikacja
+	 * 		Adres (numer) uŜytkownika, dla którego utworzona jest notyfikacja
 	 * @return przydzielone ID notyfikacji
 	 */
 	public int startNotifications(String sDest) {
@@ -73,48 +61,37 @@ public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
 		IpAppHosaUIManager appHosaUIManager = this;
 		// obiekt reprezentujący adres nadawcy wiadomości - w tym wypadku brak
 		// nadawcy
-		TpAddressRange originatingAddress = new TpAddressRange(
-				TpAddressPlan.P_ADDRESS_PLAN_UNDEFINED, "*", "", "");
+		TpAddressRange originatingAddress = new TpAddressRange(TpAddressPlan.P_ADDRESS_PLAN_UNDEFINED, "*", "", "");
 
 		// obiekt reprezentujący adres nadawcy wiadomości - w tym wypadku
 		// dowolny nadawca
-		TpAddressRange destinationAddress = new TpAddressRange(
-				TpAddressPlan.P_ADDRESS_PLAN_E164, sDest, "", "");
+		TpAddressRange destinationAddress = new TpAddressRange(TpAddressPlan.P_ADDRESS_PLAN_E164, sDest, "", "");
 		// kod usługi - 00 oznacza wiadomości SMS (np. dla MMS kod - 01)
 		String serviceCode = "00";
 
 		// kryterium uruchomienia obsługi zdarzenia - przyszła wiadomość SMS na
 		// numer destinationAddress od dowolnego numeru
-		TpUIEventCriteria criteria = new TpUIEventCriteria(originatingAddress,
-				destinationAddress, serviceCode);
+		TpUIEventCriteria criteria = new TpUIEventCriteria(originatingAddress, destinationAddress, serviceCode);
 
 		// utworzenie powiadamiania - przekazanie kryteriów i klasy
 		// implementującej interfejs obsługi zdarzeń
-		int assignmentId = itsHosaUIManager.createNotification(
-				appHosaUIManager, criteria);
-		return assignmentId;
+		return itsHosaUIManager.createNotification(appHosaUIManager, criteria);
 	}
 
 	/**
 	 * Usunięcie notyfikacji
-	 * 
-	 * @param anAssignmentId
-	 *            ID notyfikacji do usunięcia (zwróceone przez
-	 * @see messaging.MMSProcessor#startNotifications(String) startNotifications
-	 *      )
 	 */
 	public void stopNotifications(int anAssignmentId) {
 		itsHosaUIManager.destroyNotification(anAssignmentId);
 	}
 
 	/**
-	 * Wywoływana przez Ericsson Network Resource Gateway w chwili otrzymania
-	 * wiadomości
+	 * Wywoływana przez Ericsson Network Resource Gateway w chwili otrzymania wiadomości
 	 *
 	 * @see com.ericsson.hosasdk.api.hui.IpAppHosaUIManager
 	 */
-	public IpAppUI reportEventNotification(TpUIIdentifier anUserInteraction,
-			TpUIEventNotificationInfo anEventInfo, int anAssignmentID) {
+	public IpAppUI reportEventNotification(TpUIIdentifier anUserInteraction, TpUIEventNotificationInfo anEventInfo,
+			int anAssignmentID) {
 
 		String sender = anEventInfo.OriginatingAddress.AddrString;
 		String receiver = anEventInfo.DestinationAddress.AddrString;
@@ -125,19 +102,14 @@ public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
 	}
 
 	/**
-	 * Wywoływana przez Ericsson Network Resource Gateway w chwili otrzymania
-	 * wiadomości
+	 * Wywoływana przez Ericsson Network Resource Gateway w chwili otrzymania wiadomości
 	 *
 	 * @see com.ericsson.hosasdk.api.hui.IpAppHosaUIManager
-	 * @deprecated Od wersji standardu 6.0 funkcja nie będzie wspierana, zamiast
-	 *             niej naleŜy uŜywać * @see
-	 *             messaging.MMSProcessor#reportEventNotification
-	 *             (TpUIIdentifier, TpUIEventNotificationInfo,int)
-	 *             reportEventNotification . Dla zapewnienia zdgoności wstecznej
-	 *             została zaimplementowana.
+	 * @deprecated Od wersji standardu 6.0 funkcja nie będzie wspierana, zamiast niej naleŜy uŜywać * @see
+	 * messaging.MMSProcessor#reportEventNotification (TpUIIdentifier, TpUIEventNotificationInfo,int)
+	 * reportEventNotification . Dla zapewnienia zdgoności wstecznej została zaimplementowana.
 	 */
-	public IpAppUI reportNotification(TpUIIdentifier anUserInteraction,
-			TpUIEventInfo anEventInfo, int anAssignmentID) {
+	public IpAppUI reportNotification(TpUIIdentifier anUserInteraction, TpUIEventInfo anEventInfo, int anAssignmentID) {
 		// pobranie danych zdarzenia - nadawcy, odbiorcy i treści wiadomości
 		String sender = anEventInfo.OriginatingAddress.AddrString;
 		String receiver = anEventInfo.DestinationAddress.AddrString;
@@ -146,41 +118,88 @@ public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
 			if (messageContent.startsWith("dodaj")) {
 				Menu.addItem(messageContent);
 				this.sendSMS(receiver, sender, "dodano");
-			} else if(messageContent.equals("lista")) {
-				StringBuilder builder = new StringBuilder("");
-				List<Order> orders = orderManager.getOrders();
-				for(Order order : orders) {
-					builder.append(order);
-					builder.append(" ");
-				}
-				this.sendSMS(receiver, sender, builder.toString());
+			} else if (messageContent.equals("lista")) {
+				getOrderList(sender, receiver);
+			} else if (messageContent.startsWith("ok")) {
+				acceptOrder(messageContent);
+			} else if (messageContent.startsWith("odrzuc")) {
+				rejectOrder(OrderStatus.REJECTED, messageContent);
+			} else if (messageContent.startsWith("wyslij")) {
+				sendOrder(messageContent);
+			} else {
+				this.sendSMS(receiver, sender, "nieznane polecenie");
 			}
-		}
-		else if (messageContent.equals("menu")) {
+		} else if (messageContent.equals("menu")) {
 			String menu = Menu.getMenu();
 			this.sendSMS(receiver, sender, menu);
 		} else if (messageContent.startsWith("zamow")) {
-			orderManager.addOrder(messageContent, sender);
-			this.sendSMS(receiver, sender, "Zarejestrowano");
-			this.sendSMS(WORKER_NUMBER, WORKER_NUMBER, "Nowe zamowienie");
-
+			addNewOrder(sender, receiver, messageContent);
+		} else if (messageContent.equals("status")) {
+			checkOrderStatus(sender, receiver);
+		} else if (messageContent.equals("anuluj")) {
+			cancelOrder(sender, receiver);
 		} else {
 			this.sendSMS(receiver, sender, "nieznane polecenie");
 		}
 		return null;
 	}
 
-	
+	private void cancelOrder(String sender, String receiver) {
+		String resultMessage = orderManager.removeOrder(sender);
+		this.sendSMS(receiver, sender, resultMessage);
+	}
+
+	private void sendOrder(String messageContent) {
+		updateOrderStatus(OrderStatus.SENT, messageContent.replace("wyslij ", ""));
+	}
+
+	private void rejectOrder(OrderStatus rejected, String messageContent) {
+		updateOrderStatus(rejected, messageContent.replace("odrzuc ", ""));
+	}
+
+	private void acceptOrder(String messageContent) {
+		updateOrderStatus(OrderStatus.ACCEPTED, messageContent.replace("ok ", ""));
+	}
+
+	private void updateOrderStatus(OrderStatus rejected, String messageContent) {
+		String returnMessage = orderManager.updateOrderStatus(rejected, messageContent);
+		this.sendSMS(WORKER_NUMBER, WORKER_NUMBER, returnMessage);
+	}
+
+	private void getOrderList(String sender, String receiver) {
+		StringBuilder builder = new StringBuilder("");
+		List<Order> orders = orderManager.getOrders();
+		for (Order order : orders) {
+			builder.append(order);
+			builder.append(" ");
+		}
+		this.sendSMS(receiver, sender, builder.toString());
+	}
+
+	private void addNewOrder(String sender, String receiver, String messageContent) {
+		orderManager.addOrder(messageContent, sender);
+		this.sendSMS(receiver, sender, "Zarejestrowano");
+		this.sendSMS(WORKER_NUMBER, WORKER_NUMBER, "Nowe zamowienie");
+	}
+
+	private void checkOrderStatus(String sender, String receiver) {
+		Order order = orderManager.findOrderWihNumber(sender);
+		if (order != null) {
+			this.sendSMS(receiver, sender, "Aktualny status zamowienia: " + order.getStatus().getLabel());
+		} else {
+			this.sendSMS(receiver, sender, "Nie posiadasz aktualnie zadnego zamowienia");
+		}
+	}
 
 	/**
 	 * Wysłanie SMSa
 	 *
 	 * @param aSender
-	 *            nadawca
+	 * 		nadawca
 	 * @param aReceiver
-	 *            odbiorca
+	 * 		odbiorca
 	 * @param aMessageContent
-	 *            zawartość
+	 * 		zawartość
 	 */
 	public void sendSMS(String aSender, String aReceiver, String aMessageContent) {
 		IpAppHosaUIManager appHosaUIManager = this;
@@ -210,33 +229,26 @@ public class SMSProcessor extends IpAppHosaUIManagerAdapter implements
 	}
 
 	/**
-	 * Wywoływana przez Ericsson Network Resource Gateway, gdy wystąpił bład
-	 * przy wysyłaniu wiadomości
+	 * Wywoływana przez Ericsson Network Resource Gateway, gdy wystąpił bład przy wysyłaniu wiadomości
 	 *
 	 * @see com.ericsson.hosasdk.api.hui.IpAppHosaUIManager
 	 */
-	public void hosaSendMessageErr(int anAssignmentID,
-			TpHosaSendMessageError[] anErrorList) {
-		System.out.println("\nError sending the SMS to "
-				+ anErrorList[0].UserAddress.AddrString + "(ErrorCode "
+	public void hosaSendMessageErr(int anAssignmentID, TpHosaSendMessageError[] anErrorList) {
+		System.out.println("\nError sending the SMS to " + anErrorList[0].UserAddress.AddrString + "(ErrorCode "
 				+ anErrorList[0].Error.value() + ")");
 	}
 
 	/**
-	 * Wywoływana przez Ericsson Network Resource Gateway, gdy wysyłanie
-	 * wiadomości zakończyło się poprawnie
+	 * Wywoływana przez Ericsson Network Resource Gateway, gdy wysyłanie wiadomości zakończyło się poprawnie
 	 *
 	 * @see com.ericsson.hosasdk.api.hui.IpAppHosaUIManager
 	 */
-	public void hosaSendMessageRes(int anAssignmentID,
-			TpHosaSendMessageReport[] aResponseList) {
-		System.out.println("\nSMS Message sent to "
-				+ aResponseList[0].UserAddress.AddrString);
+	public void hosaSendMessageRes(int anAssignmentID, TpHosaSendMessageReport[] aResponseList) {
+		System.out.println("\nSMS Message sent to " + aResponseList[0].UserAddress.AddrString);
 	}
 
 	public static TpAddress createTpAddress(String aNumber) {
-		return new TpAddress(TpAddressPlan.P_ADDRESS_PLAN_E164,
-				aNumber, // addres
+		return new TpAddress(TpAddressPlan.P_ADDRESS_PLAN_E164, aNumber, // addres
 				"", // name
 				TpAddressPresentation.P_ADDRESS_PRESENTATION_UNDEFINED,
 				TpAddressScreening.P_ADDRESS_SCREENING_UNDEFINED, "");// podadres
